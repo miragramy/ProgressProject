@@ -1,6 +1,7 @@
 # ProgressProject
 Progress Project is a tool which monitors a directory and uploads new files to MOVEit.
 
+```
 To run locally:
      - As a prerequisite, you should have `CMake`, `vcpkg`, `make` installed before trying to run this project.
         - For CMake check out their website on https://cmake.org/download/ for your platform.
@@ -33,3 +34,4 @@ To run locally:
             - `cd build`
             - `<path\to\mingw32-make.exe>` (if you're using MinGW toolchain, otherwise just run whatever version of make you have)
      - Run the ProgressProject binary in the build directory
+```
