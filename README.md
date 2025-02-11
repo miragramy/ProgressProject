@@ -6,7 +6,8 @@ To run locally:
      - As a prerequisite, you should have `CMake`, `vcpkg`, `make` installed before trying to run this project.
         - For CMake check out their website on https://cmake.org/download/ for your platform.
           You should add CMake to your $PATH and you should set CXX as the path to your compiler.
-          This was developed using g++ so I recommend using that.
+          This was developed using g++ so I recommend using that. For Windows, I recommend using MSVC, since
+          the steps were designed and tested for using MSVC.
         
         - For vcpkg:
             - Clone the repository from https://github.com/microsoft/vcpkg.git
