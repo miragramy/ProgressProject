@@ -31,7 +31,7 @@ To run locally:
             - `make`
         - For Windows
             - `mkdir build`
-            - `cmake -B build -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=<Path/to/vcpkg>/vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake  -DVCPKG_TARGET_TRIPLET=x64-mingw-static`
+            - `cmake -B build -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=<Path/to/vcpkg>/vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake  -DVCPKG_TARGET_TRIPLET=x64-mingw-static` (You can get the path when you run ./vcpkg integrate install)
             - `cd build`
             - `<path\to\mingw32-make.exe>` (if you're using MinGW toolchain, otherwise just run whatever version of make you have)
      - Run the ProgressProject binary in the build directory
