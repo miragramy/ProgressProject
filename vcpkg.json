@@ -1,5 +1,5 @@
 {
-    "name": "ProgressProject",
+    "name": "progressproject",
     "version": "1.0.0",
     "dependencies": [
        "curl"
