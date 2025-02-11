@@ -17,7 +17,6 @@ To run locally:
                 (Desktop development for C++, Cmake Tools for Windows, Windows 10/11 SDK, MSVC v143 or later). Linux should be fine.
             - For Windows, you should also set the following environment variable $env:VCPKG_DEFAULT_TRIPLET="x64-mingw-static" since you're going to
               be using the MSVC compiler and vcpkg defaults to x64-windows triplet
-            - Clone the project (ProgressProject) and run `<PATH_TO_vcpkg>/vcpkg install` from inside the project directory.
 
         - For make:
             - On MacOS/Linux, you probably already have it installed or can use some package manager like brew to install it
