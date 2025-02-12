@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include "auth.h"
 
 namespace fs = std::filesystem;
 
@@ -74,7 +75,7 @@ int main(int argc, char **argv)
     std::cout << creds.first << " " << creds.second << std::endl;
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
-
+    Authenticate(creds.first, creds.second);
     curl_global_cleanup();
     return 0;
 }
