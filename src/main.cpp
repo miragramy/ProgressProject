@@ -1,28 +1,80 @@
 #include <curl/curl.h>
+#include <string>
 #include <iostream>
+#include <fstream>
+#include <filesystem>
 
-int main() {
-    // Initialize libcurl
-    CURL *curl = curl_easy_init();
-    if(curl) {
-        // Set the URL for the request
-        curl_easy_setopt(curl, CURLOPT_URL, "http://example.com");
+namespace fs = std::filesystem;
 
-        // Perform the request and capture the result
-        CURLcode res = curl_easy_perform(curl);
+std::pair<std::string, std::string> getCreds(std::ifstream &file)
+{
+    std::string password, username, text;
 
-        // Check for errors
-        if(res != CURLE_OK) {
-            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
-        } else {
-            std::cout << "Request successful!" << std::endl;
-        }
+    getline(file, text);
 
-        // Clean up
-        curl_easy_cleanup(curl);
-    } else {
-        std::cerr << "libcurl initialization failed!" << std::endl;
+    int index = 0;
+    while (index < text.size() && text[index] != ':')
+    {
+        username += text[index++];
     }
 
+    if (index >= text.size())
+    {
+        return {};
+    }
+
+    index += 1;
+
+    while (index < text.size())
+    {
+        password += text[index++];
+    }
+
+    if (password.empty())
+    {
+        return {};
+    }
+
+    return {username, password};
+}
+
+int main(int argc, char **argv)
+{
+    if (argc != 3)
+    {
+        std::cerr << "You need to pass 2 arguments: path to credential file and path to directory to monitor" << std::endl;
+        return -1;
+    }
+
+    std::string credsPath = argv[1];
+    std::string monitorPath = argv[2];
+
+    std::ifstream credentialsFile(credsPath);
+
+    if (!credentialsFile.is_open())
+    {
+        std::cerr << "Failed to open credentials file" << std::endl;
+        return -2;
+    }
+
+    std::pair<std::string, std::string> creds = getCreds(credentialsFile);
+
+    if (creds == std::pair<std::string, std::string>{})
+    {
+        std::cerr << "Invalid credentials file format. It should contain one line in the format <user>:<password>" << std::endl;
+        return -3;
+    }
+
+    if (!fs::exists(monitorPath) || !fs::is_directory(monitorPath))
+    {
+        std::cerr << "Invalid directory path for monitoring" << std::endl;
+        return -4;
+    }
+
+    std::cout << creds.first << " " << creds.second << std::endl;
+
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+
+    curl_global_cleanup();
     return 0;
 }
