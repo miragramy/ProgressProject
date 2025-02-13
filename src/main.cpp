@@ -4,7 +4,7 @@
 #include <fstream>
 #include <filesystem>
 #include "auth.h"
-
+#include "userCommands.h"
 namespace fs = std::filesystem;
 
 std::pair<std::string, std::string> getCreds(std::ifstream &file)
@@ -76,6 +76,8 @@ int main(int argc, char **argv)
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
     Authenticate(creds.first, creds.second);
+    AuthToken token = GetAuthToken();
+    GetUserDetails(token.accessToken);
     curl_global_cleanup();
     return 0;
 }

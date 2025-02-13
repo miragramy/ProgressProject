@@ -6,20 +6,12 @@
 
 #include "Finally.h"
 #include "auth.h"
-
-const std::string BASE_URL = "https://testserver.moveitcloud.com/";
+#include "util.h"
 
 static AuthToken authToken;
 
 namespace
 {
-    size_t ResponseCb(void *contents, size_t size, size_t nmemb, void *userData)
-    {
-        std::string *ud = static_cast<std::string *>(userData);
-        ud->append(static_cast<char *>(contents), size * nmemb);
-        return size * nmemb;
-    }
-
     unsigned long long GetTimeNowSeconds()
     {
         const auto now = std::chrono::system_clock::now();
@@ -74,8 +66,6 @@ namespace
                         authToken.refreshToken = parsedResponse["refresh_token"];
                         authToken.expirationTime = parsedResponse["expires_in"];
                         authToken.acquiredAt = GetTimeNowSeconds();
-
-                        RefreshToken(authToken.refreshToken);
                     }
                     catch (const nlohmann::json::parse_error &exc)
                     {
@@ -111,10 +101,36 @@ bool Authenticate(const std::string &username, const std::string &password)
     return AuthHelper(postArgs);
 }
 
-bool RefreshToken(const std::string &refreshToken)
+bool RefreshToken()
 {
-    std::string postArgs = "refresh_token=" + refreshToken + "&grant_type=refresh_token";
+    if(authToken.refreshToken.empty()) return false;
+
+    std::string postArgs = "refresh_token=" + authToken.refreshToken + "&grant_type=refresh_token";
     return AuthHelper(postArgs);
+}
+
+bool TokenHasExpired()
+{
+    unsigned long long timeNow = GetTimeNowSeconds();
+    return authToken.acquiredAt + authToken.expirationTime <= timeNow;   
+}
+
+bool ShouldRefreshToken()
+{
+    if(TokenHasExpired())
+    {
+        return false;
+    }
+
+    unsigned long long timeNow = GetTimeNowSeconds();
+    unsigned long long mid = authToken.acquiredAt + authToken.expirationTime / 2;
+    unsigned long long end = authToken.acquiredAt + authToken.expirationTime;
+
+    /* end - 10 so we don't get into the case where timeNow is 
+     * end - 1 because the token may expire while we make a request
+     */
+
+    return mid <= timeNow && timeNow < end - 10;
 }
 
 AuthToken GetAuthToken()

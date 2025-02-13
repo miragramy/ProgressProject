@@ -10,6 +10,9 @@ struct AuthToken
 };
 
 bool Authenticate(const std::string &username, const std::string &password);
-bool RefreshToken(const std::string &refreshToken);
+bool RefreshToken();
+
+bool TokenHasExpired();
+bool ShouldRefreshToken();
 
 AuthToken GetAuthToken();
