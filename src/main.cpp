@@ -1,7 +1,7 @@
 #include <curl/curl.h>
 
-#include<chrono>
-#include<thread>
+#include <chrono>
+#include <thread>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -78,14 +78,15 @@ int main(int argc, char **argv)
     }
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
-    if (!Authenticate(creds.first, creds.second)) {
+    if (!Authenticate(creds.first, creds.second))
+    {
         return -5;
     }
 
     AuthToken token = GetAuthToken();
     UserDetails userDetails = GetUserDetails(token.accessToken);
 
-    if(userDetails == UserDetails())
+    if (userDetails == UserDetails())
     {
         return -6;
     }
@@ -93,22 +94,50 @@ int main(int argc, char **argv)
     // Map of file path and id
     std::unordered_map<std::string, std::string> files;
 
-    while (true) {
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-        std::cout<<"Checking for files"<<std::endl;
+    while (true)
+    {
+        std::cout << "Checking for files" << std::endl;
 
-        for(const auto& file: fs::directory_iterator(monitorPath))
+        for (const auto &file : fs::directory_iterator(monitorPath))
         {
-            if(fs::is_regular_file(file.status()))
+            if (fs::is_regular_file(file.status()))
             {
-                if(files.find(file.path()) == files.end())
+                if (files.find(file.path()) == files.end())
                 {
-                    // to upload
-                    files[file.path()] = "a";
-                    std::cout<<file.path()<<std::endl;
+                    if (TokenHasExpired())
+                    {
+                        if (!Authenticate(creds.first, creds.second))
+                        {
+                            return -5;
+                        }
+
+                        token = GetAuthToken();
+                    }
+                    else
+                    {
+                        if (ShouldRefreshToken())
+                        {
+                            if (!RefreshToken())
+                            {
+                                std::cerr << "Failed to refresh token" << std::endl;
+                            }
+                            else
+                            {
+                                token = GetAuthToken();
+                            }
+                        }
+                    }
+                    std::string fileId;
+                    if (FileUpload(file.path(), userDetails.homeFolderID, token.accessToken, fileId))
+                    {
+                        files[file.path()] = fileId;
+                    }
+                    else
+                        continue;
                 }
             }
         }
+        std::this_thread::sleep_for(std::chrono::seconds(10));
     }
     return 0;
 }

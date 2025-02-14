@@ -8,7 +8,8 @@ private:
 
 public:
     Finally(std::function<void()> cb) : _cb(cb) {}
-    ~Finally(){
+    ~Finally()
+    {
         _cb();
     }
 };

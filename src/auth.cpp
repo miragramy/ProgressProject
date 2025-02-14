@@ -103,7 +103,8 @@ bool Authenticate(const std::string &username, const std::string &password)
 
 bool RefreshToken()
 {
-    if(authToken.refreshToken.empty()) return false;
+    if (authToken.refreshToken.empty())
+        return false;
 
     std::string postArgs = "refresh_token=" + authToken.refreshToken + "&grant_type=refresh_token";
     return AuthHelper(postArgs);
@@ -112,12 +113,12 @@ bool RefreshToken()
 bool TokenHasExpired()
 {
     unsigned long long timeNow = GetTimeNowSeconds();
-    return authToken.acquiredAt + authToken.expirationTime <= timeNow;   
+    return authToken.acquiredAt + authToken.expirationTime <= timeNow;
 }
 
 bool ShouldRefreshToken()
 {
-    if(TokenHasExpired())
+    if (TokenHasExpired())
     {
         return false;
     }
@@ -126,7 +127,7 @@ bool ShouldRefreshToken()
     unsigned long long mid = authToken.acquiredAt + authToken.expirationTime / 2;
     unsigned long long end = authToken.acquiredAt + authToken.expirationTime;
 
-    /* end - 10 so we don't get into the case where timeNow is 
+    /* end - 10 so we don't get into the case where timeNow is
      * end - 1 because the token may expire while we make a request
      */
 
