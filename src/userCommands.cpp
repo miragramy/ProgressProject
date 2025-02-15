@@ -126,7 +126,6 @@ bool FileUpload(const std::string &path, unsigned long long folderId, const std:
         std::string authHeader = "Authorization: Bearer " + accessToken;
 
         headers = curl_slist_append(headers, authHeader.c_str());
-        // headers = curl_slist_append(headers, "Transfer-Encoding: chunked");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
         mime = curl_mime_init(curl);
@@ -169,6 +168,19 @@ bool FileUpload(const std::string &path, unsigned long long folderId, const std:
                     std::cerr << "Failed to parse response from uploading file: " << exc.what() << std::endl;
                     return false;
                 }
+            }
+            else if (responseCode == 409)
+            {
+                std::cout << path << " has already been uploaded to MOVEit" << std::endl;
+
+                /*
+                 *  Return true here, so we don't try to upload it again. We know that this file
+                 *  has already been uploaded so there's no point in trying further.
+                 *
+                 *  A possible improvement for the future is to create a GetFile function, that will get the file id,
+                 *  so we can fill it in here, but for now, we don't need it.
+                 */
+                return true;
             }
             else
             {

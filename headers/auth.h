@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
-
+/*
+ * Struct that holds information regarding authentication info.
+ */
 struct AuthToken
 {
     std::string accessToken;

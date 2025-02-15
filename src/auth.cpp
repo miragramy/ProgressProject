@@ -23,6 +23,11 @@ namespace
         return seconds.count();
     }
 
+    /*
+     * This is a helper utility function that sends a POST request using
+     * user provided post arguments. It's meant to be used for authentication
+     * thus not setting any headers.
+     */
     bool AuthHelper(const std::string &postArgs)
     {
         // Http Response code
@@ -118,16 +123,23 @@ bool TokenHasExpired()
 
 bool ShouldRefreshToken()
 {
+    // Token can only be refreshed before it has expired.
     if (TokenHasExpired())
     {
         return false;
     }
 
+    /* If we check the token for refresh in the first half of it's lifetime, this function
+     * will return false. If the check is done during the second half of it's lifetime, it will
+     * return true.
+     */
+
     unsigned long long timeNow = GetTimeNowSeconds();
     unsigned long long mid = authToken.acquiredAt + authToken.expirationTime / 2;
     unsigned long long end = authToken.acquiredAt + authToken.expirationTime;
 
-    /* end - 10 so we don't get into the case where timeNow is
+    /*
+     * end - 10 so we don't get into the case where timeNow is
      * end - 1 because the token may expire while we make a request
      */
 

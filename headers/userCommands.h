@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 
+/*
+ * Struct that holds information regarding the current user.
+ */
 struct UserDetails
 {
     std::string userId;

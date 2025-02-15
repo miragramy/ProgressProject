@@ -10,39 +10,9 @@
 
 #include "auth.h"
 #include "userCommands.h"
+#include "util.h"
+
 namespace fs = std::filesystem;
-
-std::pair<std::string, std::string> getCreds(std::ifstream &file)
-{
-    std::string password, username, text;
-
-    getline(file, text);
-
-    int index = 0;
-    while (index < text.size() && text[index] != ':')
-    {
-        username += text[index++];
-    }
-
-    if (index >= text.size())
-    {
-        return {};
-    }
-
-    index += 1;
-
-    while (index < text.size())
-    {
-        password += text[index++];
-    }
-
-    if (password.empty())
-    {
-        return {};
-    }
-
-    return {username, password};
-}
 
 int main(int argc, char **argv)
 {
@@ -63,7 +33,7 @@ int main(int argc, char **argv)
         return -2;
     }
 
-    std::pair<std::string, std::string> creds = getCreds(credentialsFile);
+    std::pair<std::string, std::string> creds = GetCreds(credentialsFile);
 
     if (creds == std::pair<std::string, std::string>{})
     {
@@ -117,6 +87,10 @@ int main(int argc, char **argv)
                     {
                         if (ShouldRefreshToken())
                         {
+                            /*
+                             * In case we fail here, we expect that some of the later Refreshes may pass
+                             * or that we will re-authenticate when it expires.
+                             */
                             if (!RefreshToken())
                             {
                                 std::cerr << "Failed to refresh token" << std::endl;
@@ -127,6 +101,7 @@ int main(int argc, char **argv)
                             }
                         }
                     }
+
                     std::string fileId;
                     if (FileUpload(file.path(), userDetails.homeFolderID, token.accessToken, fileId))
                     {
@@ -135,9 +110,10 @@ int main(int argc, char **argv)
                     else
                         continue;
                 }
+
+                std::this_thread::sleep_for(std::chrono::seconds(10));
             }
         }
-        std::this_thread::sleep_for(std::chrono::seconds(10));
     }
     return 0;
 }
