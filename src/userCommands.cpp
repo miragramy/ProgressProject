@@ -199,4 +199,5 @@ bool FileUpload(const std::string &path, unsigned long long folderId, const std:
         std::cerr << "Failed to upload file" << std::endl;
         return false;
     }
+    return false;
 }
