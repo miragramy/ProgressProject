@@ -72,7 +72,7 @@ int main(int argc, char **argv)
         {
             if (fs::is_regular_file(file.status()))
             {
-                if (files.find(file.path()) == files.end())
+                if (files.find(file.path().string()) == files.end())
                 {
                     if (TokenHasExpired())
                     {
@@ -103,9 +103,10 @@ int main(int argc, char **argv)
                     }
 
                     std::string fileId;
-                    if (FileUpload(file.path(), userDetails.homeFolderID, token.accessToken, fileId))
+                    if (FileUpload(file.path().string(), userDetails.homeFolderID, token.accessToken, fileId))
                     {
-                        files[file.path()] = fileId;
+                        files[file.path().string()] = fileId;
+                        std::cout << "File " << file.path().string() << " was uploaded successfully" << std::endl;
                     }
                     else
                         continue;
