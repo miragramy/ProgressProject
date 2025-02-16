@@ -131,7 +131,7 @@ bool FileUpload(const std::string &path, unsigned long long folderId, const std:
         mime = curl_mime_init(curl);
         curl_mimepart *part = curl_mime_addpart(mime);
         curl_mime_name(part, "file");
-        curl_mime_filename(part, std::filesystem::path(path).filename().c_str());
+        curl_mime_filename(part, std::filesystem::path(path).filename().string().c_str());
         curl_mime_filedata(part, path.c_str());
 
         curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
